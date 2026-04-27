@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Гра в Слова</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #2196f3;
+        }
+        #word-display {
+            font-size: 2em;
+            margin-bottom: 20px;
+            letter-spacing: 0.5em;
+        }
+        #guess-input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Гра в Слова</h1>
+        <div id="word-display"></div>
+        <input type="text" id="guess-input" placeholder="Введіть літеру">
+        <button onclick="guessLetter()">Вгадати</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const words = ["сонце", "книга", "вітер", "річка", "місто", "гора", "літо", "дощ", "школа", "сад"];
+        let currentWord = "";
+        let maskedWord = "";
+        let guessedLetters = [];
+        let attemptsLeft = 6;
+
+        function startGame() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            maskedWord = "*".repeat(currentWord.length);
+            guessedLetters = [];
+            attemptsLeft = 6;
+            updateWordDisplay();
+            updateMessage("");
+        }
+
+        function updateWordDisplay() {
+            document.getElementById("word-display").textContent = maskedWord.split("").join(" ");
+        }
+
+        function updateMessage(text) {
+            document.getElementById("message").textContent = text;
+        }
+
+        function guessLetter() {
+            const guessInput = document.getElementById("guess-input");
+            const letter = guessInput.value.toLowerCase();
+            guessInput.value = "";
+
+            if (!letter.match(/[а-яіїєґ]/) || letter.length !== 1) {
+                updateMessage("Будь ласка, введіть одну українську літеру.");
+                return;
+            }
+
+            if (guessedLetters.includes(letter)) {
+                updateMessage("Ви вже вгадували цю літеру.");
+                return;
+            }
+
+            guessedLetters.push(letter);
+            let correctGuess = false;
+            let newMaskedWord = "";
+            for (let i = 0; i < currentWord.length; i++) {
+                if (currentWord[i] === letter) {
+                    newMaskedWord += letter;
+                    correctGuess = true;
+                } else {
+                    newMaskedWord += maskedWord[i];
+                }
+            }
+            maskedWord = newMaskedWord;
+            updateWordDisplay();
+
+            if (maskedWord === currentWord) {
+                updateMessage(`Вітаємо! Ви вгадали слово: ${currentWord}`);
+                setTimeout(startGame, 2000);
+                return;
+            }
+
+            if (!correctGuess) {
+                attemptsLeft--;
+                updateMessage(`Неправильна літера. Залишилось спроб: ${attemptsLeft}`);
+                if (attemptsLeft === 0) {
+                    updateMessage(`Ви програли! Загадане слово було: ${currentWord}`);
+                    setTimeout(startGame, 2000);
+                }
+            }
+        }
+
+        // Початок гри після завантаження сторінки
+        startGame();
+    </script>
+</body>
+</html>
+
+
